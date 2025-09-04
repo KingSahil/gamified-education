@@ -1,0 +1,39 @@
+🔧 **IMMEDIATE ACTION REQUIRED** 🔧
+
+Your EduQuest development server is now running at:
+🌐 **http://localhost:8000**
+
+## ⚠️ To Fix Firebase Authentication Errors:
+
+### Step 1: Open Firebase Console
+1. Go to: https://console.firebase.google.com/
+2. Select your project: **gamified-education-3a6e3**
+
+### Step 2: Add Authorized Domains
+1. Click **Authentication** in the left sidebar
+2. Go to **Settings** tab
+3. Scroll down to **Authorized domains**
+4. Click **Add domain**
+5. Add these domains one by one:
+   - `localhost`
+   - `127.0.0.1`
+
+### Step 3: Test the Application
+1. Open your browser
+2. Go to: **http://localhost:8000**
+3. Try Google Sign-in - it should now work!
+
+## 🎯 What This Fixes:
+✅ Removes "unauthorized domain" errors
+✅ Enables Google Sign-in popup
+✅ Allows Firebase Firestore connections
+✅ Enables real-time data sync
+
+## 📋 Quick Checklist:
+- [ ] Firebase Console opened
+- [ ] `localhost` added to authorized domains
+- [ ] `127.0.0.1` added to authorized domains  
+- [ ] Accessed app via http://localhost:8000
+- [ ] Tested authentication
+
+Once completed, you'll see "🔥 Firebase Connected!" in the browser console instead of error messages!

@@ -191,6 +191,12 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-brand:hover {
+            transform: scale(1.05);
         }
 
         .nav-menu {
@@ -887,6 +893,101 @@
         .toast.warning {
             border-left: 4px solid var(--warning);
         }
+
+        /* Video Player Styles */
+        .video-player-section {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 30px;
+        }
+
+        .video-player-container {
+            max-width: 100%;
+        }
+
+        .video-embed {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
+        .video-action-btn {
+            transition: all 0.3s ease;
+            background: var(--light) !important;
+            border: 1px solid var(--border) !important;
+        }
+
+        .video-action-btn:hover {
+            background: var(--primary) !important;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .video-action-btn.active {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+
+        /* Enhanced comment styles for video player */
+        .video-player-section .comments-section {
+            margin-top: 0;
+        }
+
+        .video-player-section .comment-input {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .video-player-section .comment-input input {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        .video-player-section .comment-input input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Mobile responsive for video player */
+        @media (max-width: 768px) {
+            .video-player-section {
+                padding: 20px;
+            }
+            
+            .video-player-container {
+                padding: 15px;
+            }
+            
+            .video-actions {
+                flex-wrap: wrap;
+                gap: 10px !important;
+            }
+            
+            .video-action-btn {
+                padding: 6px 10px !important;
+                font-size: 0.8rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -968,7 +1069,7 @@
         <!-- Navigation -->
         <nav class="navbar">
             <div class="nav-content">
-                <div class="nav-brand">📚 EduQuest</div>
+                <div class="nav-brand" onclick="goToHomepage()">📚 EduQuest</div>
                 
                 <div class="nav-menu">
                     <a class="nav-item active" data-section="courses">Courses</a>
@@ -1018,10 +1119,51 @@
                 <div class="video-grid" id="videoGrid">
                     <!-- Videos will be dynamically inserted here -->
                 </div>
+            </div>
+
+            <!-- Video Player Section -->
+            <div id="videoPlayerSection" class="video-player-section" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title" id="videoPlayerTitle">Video Player</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn" style="width: auto; background: var(--border); color: var(--dark);" onclick="backToVideoList()">
+                            ← Back to Videos
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Video Player Container -->
+                <div class="video-player-container" style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: var(--shadow);">
+                    <div class="video-embed" id="videoEmbed">
+                        <!-- YouTube embedded video will be inserted here -->
+                    </div>
+                    
+                    <div class="video-info" style="margin-top: 20px;">
+                        <h3 id="currentVideoTitle" style="margin: 0 0 10px 0; color: var(--dark);">Video Title</h3>
+                        <div class="video-meta" style="display: flex; gap: 20px; margin-bottom: 15px; color: var(--secondary-text); font-size: 0.9rem;">
+                            <span id="currentVideoTopic">📚 Topic</span>
+                            <span id="currentVideoDuration">⏱️ Duration</span>
+                            <span id="currentVideoDifficulty">🎯 Difficulty</span>
+                            <span id="currentVideoAddedBy">👤 Added by</span>
+                        </div>
+                        
+                        <div class="video-actions" style="display: flex; gap: 15px; align-items: center;">
+                            <button class="video-action-btn" id="currentVideoLikeBtn" onclick="likeCurrentVideo()" style="background: none; border: none; cursor: pointer; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 5px; font-size: 0.9rem;">
+                                🤍 <span id="currentVideoLikes">0</span>
+                            </button>
+                            <button class="video-action-btn" onclick="shareCurrentVideo()" style="background: none; border: none; cursor: pointer; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; color: var(--primary);">
+                                📤 Share
+                            </button>
+                            <div class="xp-reward" style="background: linear-gradient(45deg, #10b981, #22d3ee); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
+                                +<span id="currentVideoXP">50</span> XP
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Comments Section -->
-                <div class="comments-section">
-                    <h3 style="margin-bottom: 15px;">Discussion</h3>
+                <div class="comments-section" style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow);">
+                    <h3 style="margin-bottom: 15px; color: var(--dark);">💬 Discussion</h3>
                     <div class="comment-input">
                         <input type="text" id="commentInput" placeholder="Join the discussion..." onkeypress="handleCommentKeyPress(event)">
                         <button class="btn btn-primary" style="width: auto;" onclick="addComment()">Post</button>
@@ -1157,6 +1299,18 @@
         let googleProvider = null;
         let firebaseInitialized = false;
         
+        // Check if running on localhost or file protocol
+        const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        const isFileProtocol = location.protocol === 'file:';
+        
+        if (isFileProtocol) {
+            console.warn('⚠️ Running on file:// protocol');
+            console.log('🔧 For full Firebase functionality, please use the development server:');
+            console.log('   1. Run: python serve.py');
+            console.log('   2. Or double-click: start-server.bat');
+            console.log('   3. Visit: http://localhost:8000');
+        }
+        
         try {
             if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
@@ -1165,8 +1319,16 @@
             auth = firebase.auth();
             db = firebase.firestore();
             googleProvider = new firebase.auth.GoogleAuthProvider();
-            firebaseInitialized = true;
             
+            // Configure for development
+            if (isLocalhost) {
+                // Use Firebase emulator if available (optional)
+                // auth.useEmulator('http://localhost:9099');
+                // db.useEmulator('localhost', 8080);
+                console.log('🏠 Running on localhost - Firebase features enabled');
+            }
+            
+            firebaseInitialized = true;
             console.log('✅ Firebase initialized successfully');
         } catch (error) {
             console.warn('⚠️ Firebase initialization failed:', error.message);
@@ -1267,14 +1429,170 @@
         // User likes tracking
         let userLikes = new Set();
         
-        // Sample Videos Data with enhanced structure
+        // Routing and History Management
+        const AppRouter = {
+            currentRoute: '',
+            
+            // Initialize routing
+            init() {
+                // Handle browser back/forward buttons
+                window.addEventListener('popstate', (event) => {
+                    if (event.state) {
+                        this.navigateToState(event.state);
+                    } else {
+                        // Default to courses if no state
+                        this.navigate('courses');
+                    }
+                });
+                
+                // Load initial route from URL hash or default to courses
+                const hash = window.location.hash.substring(1);
+                if (hash) {
+                    this.parseAndNavigate(hash);
+                } else {
+                    this.navigate('courses');
+                }
+            },
+            
+            // Parse URL hash and navigate
+            parseAndNavigate(hash) {
+                const parts = hash.split('/');
+                const route = parts[0];
+                
+                if (route === 'course' && parts[1]) {
+                    this.navigate('course', { courseCode: parts[1] });
+                } else if (route === 'video' && parts[1]) {
+                    this.navigate('video', { videoId: parseInt(parts[1]) });
+                } else if (route === 'battle') {
+                    this.navigate('battle');
+                } else if (route === 'leaderboard') {
+                    this.navigate('leaderboard');
+                } else {
+                    this.navigate('courses');
+                }
+            },
+            
+            // Navigate to a route
+            navigate(route, params = {}) {
+                const state = { route, params };
+                
+                // Create URL hash
+                let hash = route;
+                if (route === 'course' && params.courseCode) {
+                    hash = `course/${params.courseCode}`;
+                } else if (route === 'video' && params.videoId) {
+                    hash = `video/${params.videoId}`;
+                }
+                
+                // Update browser history
+                const url = `#${hash}`;
+                if (window.location.hash !== url) {
+                    history.pushState(state, '', url);
+                }
+                
+                this.currentRoute = route;
+                this.navigateToState(state);
+            },
+            
+            // Navigate to state without changing URL
+            navigateToState(state) {
+                const { route, params } = state;
+                
+                // Hide all sections first
+                this.hideAllSections();
+                
+                // Update navigation active state
+                this.updateNavigation(route);
+                
+                // Show appropriate section
+                switch (route) {
+                    case 'courses':
+                        document.getElementById('coursesSection').style.display = 'block';
+                        loadCourses();
+                        break;
+                    case 'course':
+                        if (params.courseCode) {
+                            currentCourse = params.courseCode;
+                            showVideos(params.courseCode);
+                        }
+                        break;
+                    case 'video':
+                        if (params.videoId) {
+                            this.openVideoById(params.videoId);
+                        }
+                        break;
+                    case 'battle':
+                        document.getElementById('battleSection').style.display = 'block';
+                        break;
+                    case 'leaderboard':
+                        document.getElementById('leaderboardSection').style.display = 'block';
+                        loadLeaderboard();
+                        break;
+                    default:
+                        document.getElementById('coursesSection').style.display = 'block';
+                        loadCourses();
+                }
+            },
+            
+            // Hide all sections
+            hideAllSections() {
+                document.getElementById('coursesSection').style.display = 'none';
+                document.getElementById('videoSection').style.display = 'none';
+                document.getElementById('videoPlayerSection').style.display = 'none';
+                document.getElementById('battleSection').style.display = 'none';
+                document.getElementById('leaderboardSection').style.display = 'none';
+            },
+            
+            // Update navigation active state
+            updateNavigation(route) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    const section = item.getAttribute('data-section');
+                    if ((route === 'courses' && section === 'courses') ||
+                        (route === 'course' && section === 'courses') ||
+                        (route === 'video' && section === 'courses') ||
+                        (route === 'battle' && section === 'battle') ||
+                        (route === 'leaderboard' && section === 'leaderboard')) {
+                        item.classList.add('active');
+                    }
+                });
+            },
+            
+            // Open video by ID
+            openVideoById(videoId) {
+                let video = null;
+                let courseCode = null;
+                
+                // Find video across all courses
+                for (const [code, courseVideos] of Object.entries(videosData)) {
+                    video = courseVideos.find(v => v.id === videoId);
+                    if (video) {
+                        courseCode = code;
+                        break;
+                    }
+                }
+                
+                if (video && courseCode) {
+                    currentCourse = courseCode;
+                    showVideoPlayer(video);
+                } else {
+                    // Video not found, go to courses
+                    this.navigate('courses');
+                }
+            }
+        };
+        
+        // Track comment XP per video per user
+        let userVideoCommentXP = new Set(); // Format: `${userId}_${videoId}`
+        
+        // Sample Videos Data with real educational videos
         const videosData = {
             'CEL1020': [
                 {
                     id: 1,
-                    title: 'Introduction to Forces and Vectors',
+                    title: 'Introduction to Statics - Forces and Equilibrium',
                     topic: 'Statics of Particles',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=Oh4m8Ees-3Q',
                     upvotes: 45,
                     views: 230,
                     comments: 12,
@@ -1285,9 +1603,9 @@
                 },
                 {
                     id: 2,
-                    title: 'Equilibrium of Particles - Problem Solving',
+                    title: 'Equilibrium of Particles - Problem Solving Techniques',
                     topic: 'Statics of Particles',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=mubU-D5QdHU',
                     upvotes: 32,
                     views: 180,
                     comments: 8,
@@ -1298,9 +1616,9 @@
                 },
                 {
                     id: 10,
-                    title: 'Moment and Couples',
+                    title: 'Moments and Couples in Mechanics',
                     topic: 'Equilibrium of Rigid Bodies',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=N6X8dWYAH8E',
                     upvotes: 28,
                     views: 165,
                     comments: 6,
@@ -1311,9 +1629,9 @@
                 },
                 {
                     id: 11,
-                    title: 'Friction Problems and Solutions',
+                    title: 'Friction Problems - Static and Kinetic Friction',
                     topic: 'Friction',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=fo_pmp5rtzo',
                     upvotes: 41,
                     views: 290,
                     comments: 15,
@@ -1326,9 +1644,9 @@
             'MTL1001': [
                 {
                     id: 3,
-                    title: 'Limits and Continuity - Complete Guide',
+                    title: 'Limits and Continuity - Calculus Fundamentals',
                     topic: 'Differential Calculus',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=riXcZT2ICjA',
                     upvotes: 67,
                     views: 450,
                     comments: 23,
@@ -1339,9 +1657,9 @@
                 },
                 {
                     id: 4,
-                    title: 'Derivative Techniques',
+                    title: 'Derivative Rules and Techniques',
                     topic: 'Differential Calculus',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=S0_qX4VJhMQ',
                     upvotes: 52,
                     views: 320,
                     comments: 18,
@@ -1352,9 +1670,9 @@
                 },
                 {
                     id: 5,
-                    title: 'Matrix Operations',
+                    title: 'Matrix Operations and Linear Algebra',
                     topic: 'Matrices and Determinants',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=XkY2DOUCWMU',
                     upvotes: 38,
                     views: 275,
                     comments: 14,
@@ -1367,9 +1685,9 @@
             'PHL1083': [
                 {
                     id: 6,
-                    title: 'Newton\'s Laws of Motion',
+                    title: 'Newton\'s Laws of Motion - Classical Mechanics',
                     topic: 'Mechanics',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=kKKM8Y-u7ds',
                     upvotes: 73,
                     views: 520,
                     comments: 31,
@@ -1380,9 +1698,9 @@
                 },
                 {
                     id: 7,
-                    title: 'Wave Properties and Interference',
+                    title: 'Wave Properties and Interference Patterns',
                     topic: 'Waves and Oscillations',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=DovunOxlY1k',
                     upvotes: 45,
                     views: 310,
                     comments: 19,
@@ -1395,9 +1713,9 @@
             'MEL1021': [
                 {
                     id: 8,
-                    title: 'AutoCAD Basic Commands',
+                    title: 'AutoCAD Basic Commands and Tools',
                     topic: 'Basic Drawing Commands',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=QnHe4iMDLWs',
                     upvotes: 56,
                     views: 380,
                     comments: 22,
@@ -1410,9 +1728,9 @@
             'MEL1010': [
                 {
                     id: 9,
-                    title: 'Crystal Structure Fundamentals',
+                    title: 'Crystal Structure and Material Properties',
                     topic: 'Crystal Structure',
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: 'https://www.youtube.com/watch?v=HSTic_r5NDI',
                     upvotes: 34,
                     views: 195,
                     comments: 11,
@@ -1436,7 +1754,11 @@
         // Authentication Functions
         function signInWithGoogle() {
             if (!firebaseInitialized || !auth) {
-                showToast('Firebase not available. Using demo login instead.', 'warning');
+                if (isFileProtocol) {
+                    showToast('Please use development server for Google Sign-in (run start-server.bat)', 'warning');
+                } else {
+                    showToast('Firebase not available. Using demo login instead.', 'warning');
+                }
                 // Simulate successful Google login
                 handleAuthSuccess({
                     email: 'demo@example.com',
@@ -1465,7 +1787,15 @@
                 })
                 .catch((error) => {
                     console.error('Google sign-in error:', error);
-                    showToast('Google sign-in failed. Using demo mode.', 'warning');
+                    
+                    if (error.code === 'auth/unauthorized-domain') {
+                        showToast('Domain not authorized. Please add localhost to Firebase authorized domains.', 'error');
+                    } else if (error.code === 'auth/popup-blocked') {
+                        showToast('Popup blocked. Please allow popups and try again.', 'warning');
+                    } else {
+                        showToast('Google sign-in failed. Using demo mode.', 'warning');
+                    }
+                    
                     // Fallback to demo login
                     handleAuthSuccess({
                         email: 'demo@example.com',
@@ -1584,6 +1914,9 @@
             // Load content
             loadCourses();
             loadLeaderboard();
+            
+            // Initialize routing
+            AppRouter.init();
             
             // Show app status
             const statusMessage = firebaseInitialized ? 
@@ -1714,24 +2047,14 @@
         // Navigation
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function() {
-                // Remove active class from all items
-                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Hide all sections
-                document.getElementById('coursesSection').style.display = 'none';
-                document.getElementById('videoSection').style.display = 'none';
-                document.getElementById('battleSection').style.display = 'none';
-                document.getElementById('leaderboardSection').style.display = 'none';
-                
-                // Show selected section
                 const section = this.getAttribute('data-section');
+                
                 if (section === 'courses') {
-                    document.getElementById('coursesSection').style.display = 'block';
+                    AppRouter.navigate('courses');
                 } else if (section === 'battle') {
-                    document.getElementById('battleSection').style.display = 'block';
+                    AppRouter.navigate('battle');
                 } else if (section === 'leaderboard') {
-                    document.getElementById('leaderboardSection').style.display = 'block';
+                    AppRouter.navigate('leaderboard');
                 }
             });
         });
@@ -1744,7 +2067,7 @@
             courses.forEach(course => {
                 const courseCard = document.createElement('div');
                 courseCard.className = 'course-card';
-                courseCard.onclick = () => showVideos(course.code);
+                courseCard.onclick = () => AppRouter.navigate('course', { courseCode: course.code });
                 
                 courseCard.innerHTML = `
                     <div class="course-header">
@@ -1826,7 +2149,7 @@
                                           video.difficulty === 'Intermediate' ? '#f59e0b' : '#ef4444';
                     
                     videoCard.innerHTML = `
-                        <div class="video-thumbnail">
+                        <div class="video-thumbnail" onclick="watchVideo(${video.id})" style="cursor: pointer;">
                             <div class="play-icon">▶</div>
                             <div style="position: absolute; top: 8px; right: 8px; background: ${difficultyColor}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">
                                 ${video.difficulty}
@@ -1836,7 +2159,7 @@
                             </div>
                         </div>
                         <div class="video-info">
-                            <div class="video-title">${video.title}</div>
+                            <div class="video-title" onclick="watchVideo(${video.id})" style="cursor: pointer;">${video.title}</div>
                             <div class="video-meta">
                                 <span class="meta-item">👁 ${video.views} views</span>
                                 <span class="meta-item">💬 ${video.comments} comments</span>
@@ -1848,7 +2171,7 @@
                                     ${isLiked ? '❤️' : '🤍'} <span id="like-count-${video.id}">${video.upvotes}</span>
                                 </button>
                                 <button class="btn btn-primary" style="width: auto;" onclick="watchVideo(${video.id})">
-                                    Watch & Earn XP
+                                    🎥 Watch & Earn XP
                                 </button>
                                 <button class="vote-btn" onclick="shareVideo(${video.id})">
                                     📤 Share
@@ -1867,11 +2190,15 @@
 
         // Show Courses
         function showCourses() {
-            document.getElementById('videoSection').style.display = 'none';
-            document.getElementById('coursesSection').style.display = 'block';
+            AppRouter.navigate('courses');
+        }
+        
+        // Go to Homepage (when clicking logo)
+        function goToHomepage() {
+            AppRouter.navigate('courses');
         }
 
-        // Watch Video
+        // Watch Video - Now shows embedded player instead of redirect
         function watchVideo(videoId) {
             // Find video across all courses
             let video = null;
@@ -1884,18 +2211,134 @@
                 // Increase view count
                 video.views++;
                 
+                // Navigate to video page
+                AppRouter.navigate('video', { videoId: videoId });
+                
                 // Add XP
                 updateUserXP(video.xpReward, `Watched: ${video.title}`);
                 
                 // Show success message
                 showToast(`🎉 You earned ${video.xpReward} XP! Keep learning!`, 'success');
-                
-                // Refresh the video display
-                showVideos(currentCourse);
-                
-                // In production, this would open the YouTube video
-                window.open(video.url, '_blank');
             }
+        }
+        
+        // Global variable to store current playing video
+        let currentPlayingVideo = null;
+        
+        // Show Video Player with embedded YouTube video
+        function showVideoPlayer(video) {
+            currentPlayingVideo = video;
+            
+            // Hide video list and show player
+            document.getElementById('videoSection').style.display = 'none';
+            document.getElementById('videoPlayerSection').style.display = 'block';
+            
+            // Update video player title
+            document.getElementById('videoPlayerTitle').textContent = video.title;
+            
+            // Embed YouTube video
+            const videoEmbed = document.getElementById('videoEmbed');
+            const videoId = extractYouTubeVideoId(video.url);
+            
+            if (videoId) {
+                videoEmbed.innerHTML = `
+                    <iframe 
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+            } else {
+                videoEmbed.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f1f5f9; color: #64748b; font-size: 1.1rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">📺</div>
+                            <p>Unable to load video</p>
+                            <a href="${video.url}" target="_blank" style="color: var(--primary); text-decoration: none;">Watch on YouTube</a>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Update video information
+            document.getElementById('currentVideoTitle').textContent = video.title;
+            document.getElementById('currentVideoTopic').textContent = `📚 ${video.topic}`;
+            document.getElementById('currentVideoDuration').textContent = `⏱️ ${video.duration}`;
+            document.getElementById('currentVideoDifficulty').textContent = `🎯 ${video.difficulty}`;
+            document.getElementById('currentVideoAddedBy').textContent = `👤 ${video.addedBy}`;
+            document.getElementById('currentVideoXP').textContent = video.xpReward;
+            
+            // Update like button
+            const isLiked = userLikes.has(video.id);
+            const likeBtn = document.getElementById('currentVideoLikeBtn');
+            likeBtn.innerHTML = `${isLiked ? '❤️' : '🤍'} <span id="currentVideoLikes">${video.upvotes}</span>`;
+            likeBtn.className = `video-action-btn ${isLiked ? 'active' : ''}`;
+            
+            // Load comments for this video
+            loadVideoComments(video.id);
+        }
+        
+        // Extract YouTube Video ID from URL
+        function extractYouTubeVideoId(url) {
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[7].length === 11) ? match[7] : null;
+        }
+        
+        // Back to Video List
+        function backToVideoList() {
+            if (currentCourse) {
+                AppRouter.navigate('course', { courseCode: currentCourse });
+            } else {
+                AppRouter.navigate('courses');
+            }
+            currentPlayingVideo = null;
+        }
+        
+        // Like Current Video
+        function likeCurrentVideo() {
+            if (!currentPlayingVideo) return;
+            
+            const videoId = currentPlayingVideo.id;
+            const likeBtn = document.getElementById('currentVideoLikeBtn');
+            const likeCount = document.getElementById('currentVideoLikes');
+            
+            if (userLikes.has(videoId)) {
+                // User already liked, so unlike
+                userLikes.delete(videoId);
+                currentPlayingVideo.upvotes--;
+                likeBtn.classList.remove('active');
+                likeBtn.innerHTML = `🤍 <span id="currentVideoLikes">${currentPlayingVideo.upvotes}</span>`;
+                showToast('Like removed', 'warning');
+            } else {
+                // User hasn't liked, so like
+                userLikes.add(videoId);
+                currentPlayingVideo.upvotes++;
+                likeBtn.classList.add('active');
+                likeBtn.innerHTML = `❤️ <span id="currentVideoLikes">${currentPlayingVideo.upvotes}</span>`;
+                showToast('Liked! +5 XP', 'success');
+                
+                // Award XP for engagement
+                updateUserXP(5, 'Video like');
+            }
+        }
+        
+        // Share Current Video
+        function shareCurrentVideo() {
+            if (!currentPlayingVideo) return;
+            
+            const shareUrl = `${window.location.origin}#video-${currentPlayingVideo.id}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast('Video link copied to clipboard!', 'success');
+                
+                // Award XP for sharing
+                updateUserXP(10, 'Video share');
+            }).catch(() => {
+                // Fallback for older browsers
+                showToast('Share: ' + currentPlayingVideo.title, 'success');
+                updateUserXP(10, 'Video share');
+            });
         }
 
         // Toggle Like (Fixed functionality)
@@ -2000,13 +2443,36 @@
         };
         
         let userCommentLikes = new Set();
+        let currentVideoComments = 'global'; // Current video ID or 'global'
+        
+        // Load Comments for specific video
+        function loadVideoComments(videoId) {
+            currentVideoComments = videoId;
+            
+            // Initialize video comments if not exist
+            if (!commentsData[videoId]) {
+                commentsData[videoId] = [];
+            }
+            
+            loadComments();
+        }
         
         // Load Comments
         function loadComments() {
             const commentsContainer = document.getElementById('commentsContainer');
             commentsContainer.innerHTML = '';
             
-            const comments = commentsData.global || [];
+            const comments = commentsData[currentVideoComments] || [];
+            
+            if (comments.length === 0) {
+                commentsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #64748b;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">💬</div>
+                        <p>No comments yet. Be the first to start the discussion!</p>
+                    </div>
+                `;
+                return;
+            }
             
             comments.forEach(comment => {
                 const commentDiv = document.createElement('div');
@@ -2057,7 +2523,8 @@
 
         // Enhanced comment functionality
         function toggleCommentLike(commentId) {
-            const comment = commentsData.global.find(c => c.id === commentId);
+            const comments = commentsData[currentVideoComments] || [];
+            const comment = comments.find(c => c.id === commentId);
             if (!comment) return;
             
             const likeElement = document.querySelector(`#comment-likes-${commentId}`);
@@ -2094,7 +2561,8 @@
                 return;
             }
             
-            const comment = commentsData.global.find(c => c.id === commentId);
+            const comments = commentsData[currentVideoComments] || [];
+            const comment = comments.find(c => c.id === commentId);
             if (!comment) return;
             
             const newReply = {
@@ -2171,15 +2639,32 @@
                 replies: []
             };
             
-            commentsData.global.unshift(newComment);
+            // Add comment to appropriate video or global
+            if (currentVideoComments === 'global') {
+                commentsData.global.unshift(newComment);
+            } else {
+                if (!commentsData[currentVideoComments]) {
+                    commentsData[currentVideoComments] = [];
+                }
+                commentsData[currentVideoComments].unshift(newComment);
+            }
+            
             input.value = '';
             
             // Reload comments
             loadComments();
             
-            // Award XP for participation
-            updateUserXP(10, 'Comment posted');
-            showToast('Comment posted! +10 XP', 'success');
+            // Award XP for participation (only once per video per user)
+            const userId = currentUser.uid || currentUser.email;
+            const xpKey = `${userId}_${currentVideoComments}`;
+            
+            if (!userVideoCommentXP.has(xpKey)) {
+                userVideoCommentXP.add(xpKey);
+                updateUserXP(10, 'Comment posted');
+                showToast('Comment posted! +10 XP', 'success');
+            } else {
+                showToast('Comment posted!', 'success');
+            }
         }
 
         // Enhanced XP System with Achievements
@@ -3008,7 +3493,38 @@
         
         // Show app status information
         setTimeout(() => {
-            if (firebaseInitialized) {
+            const isFileProtocol = location.protocol === 'file:';
+            const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+            
+            if (isFileProtocol) {
+                console.log(`
+%c📁 EduQuest - File Protocol Mode
+%c⚠️ Limited functionality detected!
+
+%cTo enable full Firebase features:
+🔧 Run the development server:
+   1. Double-click: start-server.bat
+   2. Or run: python serve.py
+   3. Visit: http://localhost:8000
+
+%c📝 Current features (offline mode):
+✅ Course browsing and video management
+✅ Quiz battles and XP system
+✅ Comments and social features
+✅ Local authentication simulation
+
+%c❌ Limited features:
+❌ Real-time data sync
+❌ Google Sign-in
+❌ Multi-device access
+❌ Persistent storage`, 
+                    'color: #f59e0b; font-size: 16px; font-weight: bold',
+                    'color: #ef4444; font-size: 14px',
+                    'color: #4a90e2; font-size: 14px',
+                    'color: #10b981; font-size: 14px',
+                    'color: #94a3b8; font-size: 14px'
+                );
+            } else if (firebaseInitialized) {
                 console.log(`
 %c🔥 EduQuest - Firebase Connected!
 %c✅ All features are available:
@@ -3040,7 +3556,8 @@
 %c🛠️ To enable Firebase:
 1. Check your internet connection
 2. Verify Firebase project settings
-3. Ensure Authentication and Firestore are enabled`, 
+3. Ensure Authentication and Firestore are enabled
+4. Add your domain to Firebase authorized domains`, 
                     'color: #f59e0b; font-size: 16px; font-weight: bold',
                     'color: #ef4444; font-size: 14px',
                     'color: #10b981; font-size: 14px',

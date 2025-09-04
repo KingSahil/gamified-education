@@ -14,7 +14,11 @@ A comprehensive, gamified educational platform designed specifically for B.Tech 
 - **Course Organization**: Structured by semester and subjects
 - **Topic Categorization**: Videos organized by specific topics
 - **Progress Tracking**: Visual progress indicators for each course
-- **Video Integration**: YouTube video embedding with metadata
+- **Video Integration**: Real educational YouTube videos with embedded player
+- **In-App Video Player**: Watch videos directly within the platform
+- **Video-Specific Comments**: Discussion system for each individual video
+- **Smart XP System**: Earn XP only once per video for commenting
+- **Browser History**: Navigate with back/forward buttons and refresh support
 
 ### ⚔️ Quiz Battle System
 - **1v1 Duels**: Challenge friends to knowledge battles
@@ -82,9 +86,12 @@ A comprehensive, gamified educational platform designed specifically for B.Tech 
 
 3. **Watch & Learn**
    - Click on any course to view videos
-   - Watch videos to earn XP
-   - Like and share helpful content
-   - Participate in discussions
+   - Click video thumbnails or titles to open embedded player
+   - Watch videos directly in the app (no YouTube redirect)
+   - Videos play with autoplay and embedded controls
+   - Earn XP automatically for watching videos
+   - Like and share content directly from video player
+   - Participate in video-specific discussions
 
 4. **Add Content**
    - Contribute YouTube videos to topics
