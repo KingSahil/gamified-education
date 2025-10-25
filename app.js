@@ -143,6 +143,166 @@ const courses = [
     }
 ];
 
+// University Content (Official Teacher-Added Content)
+const universityCourses = {
+    '1': [ // Semester 1
+        {
+            code: 'CEL1020',
+            title: 'Engineering Mechanics',
+            teacher: 'Dr. R.K. Sharma',
+            credits: 4,
+            lectures: 30,
+            assignments: 5,
+            progress: 0
+        },
+        {
+            code: 'MTL1001',
+            title: 'Mathematics-I',
+            teacher: 'Prof. A. Kumar',
+            credits: 4,
+            lectures: 35,
+            assignments: 6,
+            progress: 0
+        },
+        {
+            code: 'PHL1083',
+            title: 'Physics',
+            teacher: 'Dr. S. Verma',
+            credits: 4,
+            lectures: 28,
+            assignments: 5,
+            progress: 0
+        },
+        {
+            code: 'MEL1021',
+            title: 'Engineering Graphics & Drafting',
+            teacher: 'Prof. M. Gupta',
+            credits: 4,
+            lectures: 20,
+            assignments: 4,
+            progress: 0
+        },
+        {
+            code: 'MEL1010',
+            title: 'Introduction to Eng. Materials',
+            teacher: 'Dr. P. Rao',
+            credits: 3,
+            lectures: 18,
+            assignments: 3,
+            progress: 0
+        }
+    ]
+};
+
+// University Videos (Teacher-Added Official Lectures)
+const universityVideos = {
+    'CEL1020': [
+        {
+            id: 'u1',
+            title: 'Lecture 1: Introduction to Statics',
+            topic: 'Statics of Particles',
+            teacher: 'Dr. R.K. Sharma',
+            url: 'https://www.youtube.com/watch?v=Oh4m8Ees-3Q',
+            duration: '45:00',
+            views: 0,
+            xpReward: 100,
+            type: 'lecture'
+        },
+        {
+            id: 'u2',
+            title: 'Lecture 2: Forces and Equilibrium',
+            topic: 'Statics of Particles',
+            teacher: 'Dr. R.K. Sharma',
+            url: 'https://www.youtube.com/watch?v=mubU-D5QdHU',
+            duration: '50:00',
+            views: 0,
+            xpReward: 100,
+            type: 'lecture'
+        }
+    ],
+    'MTL1001': [
+        {
+            id: 'u3',
+            title: 'Lecture 1: Limits and Continuity',
+            topic: 'Differential Calculus',
+            teacher: 'Prof. A. Kumar',
+            url: 'https://www.youtube.com/watch?v=riXcZT2ICjA',
+            duration: '55:00',
+            views: 0,
+            xpReward: 100,
+            type: 'lecture'
+        }
+    ],
+    'PHL1083': [
+        {
+            id: 'u4',
+            title: 'Lecture 1: Newton\'s Laws of Motion',
+            topic: 'Mechanics',
+            teacher: 'Dr. S. Verma',
+            url: 'https://www.youtube.com/watch?v=kKKM8Y-u7ds',
+            duration: '48:00',
+            views: 0,
+            xpReward: 100,
+            type: 'lecture'
+        }
+    ]
+};
+
+// Assignments Data
+const assignmentsData = {
+    'CEL1020': [
+        {
+            id: 'a1',
+            title: 'Assignment 1: Statics Problems',
+            description: 'Solve problems on equilibrium of particles and rigid bodies',
+            dueDate: '2025-11-05',
+            totalMarks: 20,
+            submissions: 0,
+            status: 'pending', // pending, submitted, graded
+            xpReward: 150
+        },
+        {
+            id: 'a2',
+            title: 'Assignment 2: Friction Analysis',
+            description: 'Practical problems on static and kinetic friction',
+            dueDate: '2025-11-15',
+            totalMarks: 20,
+            submissions: 0,
+            status: 'pending',
+            xpReward: 150
+        }
+    ],
+    'MTL1001': [
+        {
+            id: 'a3',
+            title: 'Assignment 1: Calculus Problems',
+            description: 'Differentiation and integration problems',
+            dueDate: '2025-11-08',
+            totalMarks: 25,
+            submissions: 0,
+            status: 'pending',
+            xpReward: 150
+        }
+    ],
+    'PHL1083': [
+        {
+            id: 'a4',
+            title: 'Assignment 1: Mechanics Problems',
+            description: 'Problems on Newton\'s laws and motion',
+            dueDate: '2025-11-10',
+            totalMarks: 20,
+            submissions: 0,
+            status: 'pending',
+            xpReward: 150
+        }
+    ]
+};
+
+// User semester and branch
+let userSemester = null;
+let userBranch = null;
+let currentSection = 'university'; // 'university' or 'community'
+
 // User likes tracking
 let userLikes = new Set();
 
@@ -614,33 +774,20 @@ function signInWithEmail(email, password) {
 function handleAuthSuccess(userData) {
     currentUser = userData;
     userXP = userData.xp || 0;
+    userSemester = userData.semester;
+    userBranch = userData.branch;
     
-    // Show dashboard
+    // Hide auth section
     document.getElementById('authSection').style.display = 'none';
-    document.getElementById('dashboardSection').style.display = 'block';
     
-    // Update user info
-    if (userData.photoURL) {
-        const avatar = document.getElementById('userAvatar');
-        avatar.innerHTML = `<img src="${userData.photoURL}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+    // Check if semester is selected
+    if (!userSemester || !userBranch) {
+        // Show semester selection
+        document.getElementById('semesterSelectionSection').style.display = 'flex';
     } else {
-        document.getElementById('userAvatar').textContent = userData.fullName[0].toUpperCase();
+        // Show dashboard directly
+        showDashboardAfterSemesterSelection();
     }
-    document.getElementById('userXP').textContent = userXP;
-    
-    // Load content
-    loadCourses();
-    loadLeaderboard();
-    
-    // Initialize routing
-    AppRouter.init();
-    
-    // Show app status
-    const statusMessage = firebaseInitialized ? 
-        `Welcome back, ${userData.fullName}! 🔥 All features enabled` :
-        `Welcome ${userData.fullName}! 📝 Running in offline mode`;
-    
-    showToast(statusMessage, firebaseInitialized ? 'success' : 'warning');
 }
 
 // Auth state observer
@@ -705,6 +852,487 @@ function signOut() {
         showToast('Signed out successfully', 'success');
     }
 }
+
+// Semester Selection and Dashboard Loading
+function loadDashboard() {
+    const semester = document.getElementById('userSemester').value;
+    const branch = document.getElementById('userBranch').value;
+    
+    if (!semester || !branch) {
+        showToast('Please select both semester and branch', 'error');
+        return;
+    }
+    
+    userSemester = semester;
+    userBranch = branch;
+    
+    // Update current user data
+    if (currentUser) {
+        currentUser.semester = semester;
+        currentUser.branch = branch;
+    }
+    
+    showDashboardAfterSemesterSelection();
+}
+
+function showDashboardAfterSemesterSelection() {
+    // Hide semester selection
+    document.getElementById('semesterSelectionSection').style.display = 'none';
+    
+    // Show dashboard
+    document.getElementById('dashboardSection').style.display = 'block';
+    
+    // Update user info
+    if (currentUser.photoURL) {
+        const avatar = document.getElementById('userAvatar');
+        avatar.innerHTML = `<img src="${currentUser.photoURL}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+    } else {
+        document.getElementById('userAvatar').textContent = currentUser.fullName[0].toUpperCase();
+    }
+    document.getElementById('userXP').textContent = userXP;
+    
+    // Load content for selected semester
+    loadUniversityCourses();
+    loadCommunityCourses();
+    loadLeaderboard();
+    
+    // Show university section by default
+    showSection('university');
+    
+    // Show welcome message
+    const statusMessage = firebaseInitialized ? 
+        `Welcome to Semester ${userSemester}, ${currentUser.fullName}! 🔥` :
+        `Welcome to Semester ${userSemester}, ${currentUser.fullName}! 📝`;
+    
+    showToast(statusMessage, 'success');
+}
+
+function changeSemester() {
+    // Hide dashboard and show semester selection
+    document.getElementById('dashboardSection').style.display = 'none';
+    document.getElementById('semesterSelectionSection').style.display = 'flex';
+    
+    // Pre-fill current selections
+    if (userSemester) document.getElementById('userSemester').value = userSemester;
+    if (userBranch) document.getElementById('userBranch').value = userBranch;
+    
+    toggleUserMenu();
+}
+
+// Section Navigation
+function showSection(section) {
+    currentSection = section;
+    
+    // Hide all main sections
+    document.getElementById('universitySection').style.display = 'none';
+    document.getElementById('communitySection').style.display = 'none';
+    document.getElementById('universityCourseDetailSection').style.display = 'none';
+    document.getElementById('videoSection').style.display = 'none';
+    document.getElementById('videoPlayerSection').style.display = 'none';
+    document.getElementById('battleSection').style.display = 'none';
+    document.getElementById('leaderboardSection').style.display = 'none';
+    
+    // Update navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-section') === section) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Show selected section
+    switch(section) {
+        case 'university':
+            document.getElementById('universitySection').style.display = 'block';
+            loadUniversityCourses();
+            break;
+        case 'community':
+            document.getElementById('communitySection').style.display = 'block';
+            loadCommunityCourses();
+            break;
+        case 'battle':
+            document.getElementById('battleSection').style.display = 'block';
+            break;
+        case 'leaderboard':
+            document.getElementById('leaderboardSection').style.display = 'block';
+            loadLeaderboard();
+            break;
+    }
+}
+
+function goToHomepage() {
+    showSection('university');
+}
+
+function backToUniversity() {
+    showSection('university');
+}
+
+function backToCommunity() {
+    showSection('community');
+}
+
+// Load University Courses
+function loadUniversityCourses() {
+    const courseGrid = document.getElementById('universityCourseGrid');
+    courseGrid.innerHTML = '';
+    
+    // Update title with current semester
+    document.getElementById('universitySectionTitle').textContent = `🏛️ University - Semester ${userSemester}`;
+    
+    const semesterCourses = universityCourses[userSemester] || [];
+    
+    if (semesterCourses.length === 0) {
+        courseGrid.innerHTML = '<p style="text-align: center; color: #64748b; grid-column: 1/-1;">No courses available for this semester yet.</p>';
+        return;
+    }
+    
+    semesterCourses.forEach(course => {
+        const courseCard = document.createElement('div');
+        courseCard.className = 'course-card';
+        courseCard.onclick = () => showUniversityCourseDetail(course.code);
+        
+        courseCard.innerHTML = `
+            <div class="course-header">
+                <div class="course-code">${course.code}</div>
+                <div class="course-title">${course.title}</div>
+                <div style="font-size: 0.85rem; margin-top: 5px; opacity: 0.9;">👨‍🏫 ${course.teacher}</div>
+            </div>
+            <div class="course-body">
+                <div class="course-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${course.lectures}</div>
+                        <div class="stat-label">Lectures</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${course.assignments}</div>
+                        <div class="stat-label">Assignments</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${course.credits}</div>
+                        <div class="stat-label">Credits</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${course.progress}%"></div>
+                </div>
+                <div class="progress-text">${course.progress === 0 ? 'Start your journey! 🚀' : `${course.progress}% Complete`}</div>
+            </div>
+        `;
+        
+        courseGrid.appendChild(courseCard);
+    });
+}
+
+// Load Community Courses (existing student-contributed content)
+function loadCommunityCourses() {
+    const courseGrid = document.getElementById('communityCourseGrid');
+    courseGrid.innerHTML = '';
+    
+    courses.forEach(course => {
+        const courseCard = document.createElement('div');
+        courseCard.className = 'course-card';
+        courseCard.onclick = () => showCommunityVideos(course.code);
+        
+        courseCard.innerHTML = `
+            <div class="course-header">
+                <div class="course-code">${course.code}</div>
+                <div class="course-title">${course.title}</div>
+            </div>
+            <div class="course-body">
+                <div class="course-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${course.videos}</div>
+                        <div class="stat-label">Videos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${course.credits}</div>
+                        <div class="stat-label">Credits</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${course.progress}%</div>
+                        <div class="stat-label">Complete</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${course.progress}%"></div>
+                </div>
+                <div class="progress-text">Community-driven content 👥</div>
+            </div>
+        `;
+        
+        courseGrid.appendChild(courseCard);
+    });
+}
+
+// Show University Course Detail with Tabs
+function showUniversityCourseDetail(courseCode) {
+    currentCourse = courseCode;
+    const semesterCourses = universityCourses[userSemester] || [];
+    const course = semesterCourses.find(c => c.code === courseCode);
+    
+    if (!course) return;
+    
+    document.getElementById('universitySection').style.display = 'none';
+    document.getElementById('universityCourseDetailSection').style.display = 'block';
+    document.getElementById('universityCourseDetailTitle').textContent = `${course.code} - ${course.title}`;
+    
+    // Show videos tab by default
+    showCourseTab('videos');
+}
+
+function showCourseTab(tab) {
+    // Update tab buttons
+    document.getElementById('videosTab').classList.remove('active');
+    document.getElementById('assignmentsTab').classList.remove('active');
+    
+    // Hide all tab contents
+    document.getElementById('videosTabContent').style.display = 'none';
+    document.getElementById('assignmentsTabContent').style.display = 'none';
+    
+    // Show selected tab
+    if (tab === 'videos') {
+        document.getElementById('videosTab').classList.add('active');
+        document.getElementById('videosTabContent').style.display = 'block';
+        loadUniversityVideos();
+    } else if (tab === 'assignments') {
+        document.getElementById('assignmentsTab').classList.add('active');
+        document.getElementById('assignmentsTabContent').style.display = 'block';
+        loadAssignments();
+    }
+}
+
+// Load University Videos
+function loadUniversityVideos() {
+    const videoGrid = document.getElementById('universityVideoGrid');
+    videoGrid.innerHTML = '';
+    
+    const videos = universityVideos[currentCourse] || [];
+    
+    if (videos.length === 0) {
+        videoGrid.innerHTML = '<p style="text-align: center; color: #64748b;">No lectures uploaded yet.</p>';
+        return;
+    }
+    
+    videos.forEach(video => {
+        const videoCard = document.createElement('div');
+        videoCard.className = 'video-card';
+        
+        videoCard.innerHTML = `
+            <div class="video-thumbnail" onclick="watchUniversityVideo('${video.id}')" style="cursor: pointer;">
+                <div class="play-icon">▶</div>
+                <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">
+                    ${video.duration}
+                </div>
+            </div>
+            <div class="video-info">
+                <div class="video-title" onclick="watchUniversityVideo('${video.id}')" style="cursor: pointer;">${video.title}</div>
+                <div class="video-meta">
+                    <span class="meta-item">📚 ${video.topic}</span>
+                    <span class="meta-item">👨‍🏫 ${video.teacher}</span>
+                    <span class="meta-item">⚡ ${video.xpReward} XP</span>
+                </div>
+                <div class="vote-section">
+                    <button class="btn btn-primary" style="width: auto;" onclick="watchUniversityVideo('${video.id}')">
+                        🎥 Watch Lecture
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        videoGrid.appendChild(videoCard);
+    });
+}
+
+// Load Assignments
+function loadAssignments() {
+    const assignmentsGrid = document.getElementById('assignmentsGrid');
+    assignmentsGrid.innerHTML = '';
+    
+    const assignments = assignmentsData[currentCourse] || [];
+    
+    if (assignments.length === 0) {
+        assignmentsGrid.innerHTML = '<p style="text-align: center; color: #64748b;">No assignments available yet.</p>';
+        return;
+    }
+    
+    assignments.forEach(assignment => {
+        const assignmentCard = document.createElement('div');
+        assignmentCard.className = 'assignment-card';
+        assignmentCard.style.cssText = `
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        `;
+        
+        const dueDate = new Date(assignment.dueDate);
+        const today = new Date();
+        const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+        const isOverdue = daysLeft < 0;
+        const statusColor = assignment.status === 'graded' ? '#10b981' : assignment.status === 'submitted' ? '#f59e0b' : '#ef4444';
+        const statusText = assignment.status === 'graded' ? 'Graded' : assignment.status === 'submitted' ? 'Submitted' : 'Pending';
+        
+        assignmentCard.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                <div>
+                    <h3 style="margin: 0 0 8px 0; color: var(--dark);">${assignment.title}</h3>
+                    <p style="margin: 0; color: #64748b; font-size: 0.95rem;">${assignment.description}</p>
+                </div>
+                <div style="background: ${statusColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; white-space: nowrap;">
+                    ${statusText}
+                </div>
+            </div>
+            <div style="display: flex; gap: 20px; margin-bottom: 15px; font-size: 0.9rem; color: #64748b;">
+                <span>📅 Due: ${dueDate.toLocaleDateString()}</span>
+                <span>📊 Marks: ${assignment.totalMarks}</span>
+                <span>⚡ Reward: ${assignment.xpReward} XP</span>
+                ${isOverdue ? '<span style="color: var(--danger); font-weight: bold;">⚠️ Overdue</span>' : daysLeft <= 3 ? `<span style="color: var(--warning); font-weight: bold;">⏰ ${daysLeft} days left</span>` : ''}
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" style="width: auto; ${assignment.status === 'submitted' ? 'opacity: 0.5; cursor: not-allowed;' : ''}" onclick="submitAssignment('${assignment.id}')" ${assignment.status === 'submitted' ? 'disabled' : ''}>
+                    ${assignment.status === 'submitted' ? '✓ Submitted' : '📤 Submit Assignment'}
+                </button>
+                <button class="btn" style="width: auto; background: var(--border); color: var(--dark);" onclick="viewAssignment('${assignment.id}')">
+                    👁️ View Details
+                </button>
+            </div>
+        `;
+        
+        assignmentsGrid.appendChild(assignmentCard);
+    });
+}
+
+// Watch University Video
+function watchUniversityVideo(videoId) {
+    // Find video across all courses
+    let video = null;
+    for (const courseVideos of Object.values(universityVideos)) {
+        video = courseVideos.find(v => v.id === videoId);
+        if (video) break;
+    }
+    
+    if (video) {
+        video.views++;
+        showVideoPlayer(video);
+        updateUserXP(video.xpReward, `Watched: ${video.title}`);
+        showToast(`🎉 You earned ${video.xpReward} XP! Keep learning!`, 'success');
+    }
+}
+
+// Show Community Videos (existing functionality)
+function showCommunityVideos(courseCode) {
+    currentCourse = courseCode;
+    const course = courses.find(c => c.code === courseCode);
+    
+    document.getElementById('communitySection').style.display = 'none';
+    document.getElementById('videoSection').style.display = 'block';
+    document.getElementById('videoSectionTitle').textContent = `${course.title} - Community Videos`;
+    
+    const videoGrid = document.getElementById('videoGrid');
+    videoGrid.innerHTML = '';
+    
+    const videos = videosData[courseCode] || [];
+    
+    if (videos.length === 0) {
+        videoGrid.innerHTML = '<p style="text-align: center; color: #64748b;">No videos added yet. Be the first to add one!</p>';
+        return;
+    }
+    
+    // Group videos by topic
+    const videosByTopic = {};
+    videos.forEach(video => {
+        if (!videosByTopic[video.topic]) {
+            videosByTopic[video.topic] = [];
+        }
+        videosByTopic[video.topic].push(video);
+    });
+    
+    // Display videos grouped by topics
+    Object.keys(videosByTopic).forEach(topic => {
+        // Topic header
+        const topicHeader = document.createElement('div');
+        topicHeader.innerHTML = `
+            <h3 style="margin: 30px 0 15px 0; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 10px;">
+                📚 ${topic}
+            </h3>
+        `;
+        videoGrid.appendChild(topicHeader);
+        
+        // Videos in this topic
+        videosByTopic[topic].forEach(video => {
+            const videoCard = document.createElement('div');
+            videoCard.className = 'video-card';
+            
+            const isLiked = userLikes.has(video.id);
+            const difficultyColor = video.difficulty === 'Beginner' ? '#10b981' : 
+                                  video.difficulty === 'Intermediate' ? '#f59e0b' : '#ef4444';
+            
+            videoCard.innerHTML = `
+                <div class="video-thumbnail" onclick="watchVideo(${video.id})" style="cursor: pointer;">
+                    <div class="play-icon">▶</div>
+                    <div style="position: absolute; top: 8px; right: 8px; background: ${difficultyColor}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">
+                        ${video.difficulty}
+                    </div>
+                    <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">
+                        ${video.duration}
+                    </div>
+                </div>
+                <div class="video-info">
+                    <div class="video-title" onclick="watchVideo(${video.id})" style="cursor: pointer;">${video.title}</div>
+                    <div class="video-meta">
+                        <span class="meta-item">👁 ${video.views} views</span>
+                        <span class="meta-item">💬 ${video.comments} comments</span>
+                        <span class="meta-item">⚡ ${video.xpReward} XP</span>
+                        <span class="meta-item">👤 ${video.addedBy}</span>
+                    </div>
+                    <div class="vote-section">
+                        <button class="vote-btn ${isLiked ? 'active' : ''}" onclick="toggleLike(${video.id})" id="like-btn-${video.id}">
+                            ${isLiked ? '❤️' : '🤍'} <span id="like-count-${video.id}">${video.upvotes}</span>
+                        </button>
+                        <button class="btn btn-primary" style="width: auto;" onclick="watchVideo(${video.id})">
+                            🎥 Watch & Earn XP
+                        </button>
+                        <button class="vote-btn" onclick="shareVideo(${video.id})">
+                            📤 Share
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            videoGrid.appendChild(videoCard);
+        });
+    });
+    
+    // Load comments
+    loadComments();
+}
+
+// Assignment Functions
+function submitAssignment(assignmentId) {
+    // Find assignment across all courses
+    let assignment = null;
+    for (const courseAssignments of Object.values(assignmentsData)) {
+        assignment = courseAssignments.find(a => a.id === assignmentId);
+        if (assignment) break;
+    }
+    
+    if (assignment && assignment.status === 'pending') {
+        assignment.status = 'submitted';
+        assignment.submissions++;
+        updateUserXP(assignment.xpReward, `Submitted: ${assignment.title}`);
+        showToast(`Assignment submitted! +${assignment.xpReward} XP earned! 🎉`, 'success');
+        loadAssignments(); // Refresh assignments view
+    }
+}
+
+function viewAssignment(assignmentId) {
+    showToast('Assignment details will open here', 'warning');
+    // In a real implementation, this would open assignment details
+}
+
 // Authentication Toggle
 document.getElementById('authToggle').addEventListener('click', (e) => {
     e.preventDefault();
@@ -765,154 +1393,24 @@ document.getElementById('authForm').addEventListener('submit', (e) => {
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', function() {
         const section = this.getAttribute('data-section');
-        
-        if (section === 'courses') {
-            AppRouter.navigate('courses');
-        } else if (section === 'battle') {
-            AppRouter.navigate('battle');
-        } else if (section === 'leaderboard') {
-            AppRouter.navigate('leaderboard');
-        }
+        showSection(section);
     });
 });
 
-// Load Courses
+// Legacy load courses function (kept for compatibility)
 function loadCourses() {
-    const courseGrid = document.getElementById('courseGrid');
-    courseGrid.innerHTML = '';
-    
-    courses.forEach(course => {
-        const courseCard = document.createElement('div');
-        courseCard.className = 'course-card';
-        courseCard.onclick = () => AppRouter.navigate('course', { courseCode: course.code });
-        
-        courseCard.innerHTML = `
-            <div class="course-header">
-                <div class="course-code">${course.code}</div>
-                <div class="course-title">${course.title}</div>
-            </div>
-            <div class="course-body">
-                <div class="course-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">${course.videos}</div>
-                        <div class="stat-label">Videos</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${course.credits}</div>
-                        <div class="stat-label">Credits</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${course.progress}%</div>
-                        <div class="stat-label">Complete</div>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${course.progress}%"></div>
-                </div>
-                <div class="progress-text">Keep going! You're doing great 💪</div>
-            </div>
-        `;
-        
-        courseGrid.appendChild(courseCard);
-    });
+    // This now just calls loadCommunityCourses
+    loadCommunityCourses();
 }
 
-// Show Videos for a Course
+// Show Videos for a Course (Legacy - redirects to community videos)
 function showVideos(courseCode) {
-    currentCourse = courseCode;
-    const course = courses.find(c => c.code === courseCode);
-    
-    document.getElementById('coursesSection').style.display = 'none';
-    document.getElementById('videoSection').style.display = 'block';
-    document.getElementById('videoSectionTitle').textContent = `${course.title} - Videos`;
-    
-    const videoGrid = document.getElementById('videoGrid');
-    videoGrid.innerHTML = '';
-    
-    const videos = videosData[courseCode] || [];
-    
-    if (videos.length === 0) {
-        videoGrid.innerHTML = '<p style="text-align: center; color: #64748b;">No videos added yet. Be the first to add one!</p>';
-        return;
-    }
-    
-    // Group videos by topic
-    const videosByTopic = {};
-    videos.forEach(video => {
-        if (!videosByTopic[video.topic]) {
-            videosByTopic[video.topic] = [];
-        }
-        videosByTopic[video.topic].push(video);
-    });
-    
-    // Display videos grouped by topics
-    Object.keys(videosByTopic).forEach(topic => {
-        // Topic header
-        const topicHeader = document.createElement('div');
-        topicHeader.innerHTML = `
-            <h3 style="margin: 30px 0 15px 0; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 10px;">
-                📚 ${topic}
-            </h3>
-        `;
-        videoGrid.appendChild(topicHeader);
-        
-        // Videos in this topic
-        videosByTopic[topic].forEach(video => {
-            const videoCard = document.createElement('div');
-            videoCard.className = 'video-card';
-            
-            const isLiked = userLikes.has(video.id);
-            const difficultyColor = video.difficulty === 'Beginner' ? '#10b981' : 
-                                    video.difficulty === 'Intermediate' ? '#f59e0b' : '#ef4444';
-            
-            videoCard.innerHTML = `
-                <div class="video-thumbnail" onclick="watchVideo(${video.id})" style="cursor: pointer;">
-                    <div class="play-icon">▶</div>
-                    <div style="position: absolute; top: 8px; right: 8px; background: ${difficultyColor}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">
-                        ${video.difficulty}
-                    </div>
-                    <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">
-                        ${video.duration}
-                    </div>
-                </div>
-                <div class="video-info">
-                    <div class="video-title" onclick="watchVideo(${video.id})" style="cursor: pointer;">${video.title}</div>
-                    <div class="video-meta">
-                        <span class="meta-item">👁 ${video.views} views</span>
-                        <span class="meta-item">💬 ${video.comments} comments</span>
-                        <span class="meta-item">⚡ ${video.xpReward} XP</span>
-                        <span class="meta-item">👤 ${video.addedBy}</span>
-                    </div>
-                    <div class="vote-section">
-                        <button class="vote-btn ${isLiked ? 'active' : ''}" onclick="toggleLike(${video.id})" id="like-btn-${video.id}">
-                            ${isLiked ? '❤️' : '🤍'} <span id="like-count-${video.id}">${video.upvotes}</span>
-                        </button>
-                        <button class="btn btn-primary" style="width: auto;" onclick="watchVideo(${video.id})">
-                            🎥 Watch & Earn XP
-                        </button>
-                        <button class="vote-btn" onclick="shareVideo(${video.id})">
-                            📤 Share
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            videoGrid.appendChild(videoCard);
-        });
-    });
-    
-    // Load comments
-    loadComments();
+    showCommunityVideos(courseCode);
 }
 
-// Show Courses
+// Show Courses (Legacy - redirects to community section)
 function showCourses() {
-    AppRouter.navigate('courses');
-}
-
-// Go to Homepage (when clicking logo)
-function goToHomepage() {
-    AppRouter.navigate('courses');
+    showSection('community');
 }
 
 // Watch Video - Now shows embedded player instead of redirect

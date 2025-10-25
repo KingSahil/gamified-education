@@ -89,6 +89,47 @@
         </div>
     </div>
 
+    <!-- Semester Selection Screen -->
+    <div id="semesterSelectionSection" class="auth-container" style="display: none;">
+        <div class="auth-card" style="max-width: 600px;">
+            <div class="logo">
+                <h1>🎓 Welcome to EduQuest!</h1>
+                <p>Select your semester to get started</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="userSemester">Current Semester</label>
+                <select id="userSemester" required>
+                    <option value="">Select Semester</option>
+                    <option value="1">1st Semester</option>
+                    <option value="2">2nd Semester</option>
+                    <option value="3">3rd Semester</option>
+                    <option value="4">4th Semester</option>
+                    <option value="5">5th Semester</option>
+                    <option value="6">6th Semester</option>
+                    <option value="7">7th Semester</option>
+                    <option value="8">8th Semester</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="userBranch">Branch</label>
+                <select id="userBranch" required>
+                    <option value="">Select Branch</option>
+                    <option value="CSE">Computer Science & Engineering</option>
+                    <option value="ECE">Electronics & Communication</option>
+                    <option value="ME">Mechanical Engineering</option>
+                    <option value="CE">Civil Engineering</option>
+                    <option value="EE">Electrical Engineering</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" onclick="loadDashboard()">
+                Continue to Dashboard →
+            </button>
+        </div>
+    </div>
+
     <!-- Dashboard Section -->
     <div id="dashboardSection" class="dashboard">
         <!-- Navigation -->
@@ -97,9 +138,10 @@
                 <div class="nav-brand" onclick="goToHomepage()">📚 EduQuest</div>
                 
                 <div class="nav-menu">
-                    <a class="nav-item active" data-section="courses">Courses</a>
-                    <a class="nav-item" data-section="battle">Quiz Battle</a>
-                    <a class="nav-item" data-section="leaderboard">Leaderboard</a>
+                    <a class="nav-item active" data-section="university">🏛️ University</a>
+                    <a class="nav-item" data-section="community">👥 Community</a>
+                    <a class="nav-item" data-section="battle">⚔️ Quiz Battle</a>
+                    <a class="nav-item" data-section="leaderboard">🏆 Leaderboard</a>
                 </div>
                 
                 <div class="user-profile">
@@ -107,6 +149,7 @@
                     <div class="avatar" id="userAvatar" onclick="toggleUserMenu()">A</div>
                     <div id="userMenu" class="user-menu" style="display: none;">
                         <div class="menu-item" onclick="showProfile()">👤 Profile</div>
+                        <div class="menu-item" onclick="changeSemester()">🔄 Change Semester</div>
                         <div class="menu-item" onclick="signOut()">🚪 Sign Out</div>
                     </div>
                 </div>
@@ -115,28 +158,78 @@
 
         <!-- Main Content Area -->
         <div class="content-area">
-            <!-- Courses Section -->
-            <div id="coursesSection" class="courses-section">
+            <!-- University Section (Official Teacher Content) -->
+            <div id="universitySection" class="university-section">
                 <div class="section-header">
-                    <h2 class="section-title">Semester 1 - CSE</h2>
-                    <!-- Add Video button removed from homepage -->
+                    <div>
+                        <h2 class="section-title" id="universitySectionTitle">🏛️ University - Semester 1</h2>
+                        <p style="color: #64748b; margin-top: 5px;">Official courses, videos, and assignments from your teachers</p>
+                    </div>
                 </div>
                 
-                <div class="course-grid" id="courseGrid">
-                    <!-- Courses will be dynamically inserted here -->
+                <div class="course-grid" id="universityCourseGrid">
+                    <!-- University courses will be dynamically inserted here -->
                 </div>
             </div>
 
-            <!-- Video Section -->
-            <div id="videoSection" class="video-section">
+            <!-- Community Section (Student Contributed Content) -->
+            <div id="communitySection" class="community-section" style="display: none;">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">👥 Community Learning Hub</h2>
+                        <p style="color: #64748b; margin-top: 5px;">Student-contributed videos and collaborative learning resources</p>
+                    </div>
+                </div>
+                
+                <div class="course-grid" id="communityCourseGrid">
+                    <!-- Community courses will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- University Course Detail Section -->
+            <div id="universityCourseDetailSection" class="video-section" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title" id="universityCourseDetailTitle">Course Details</h2>
+                    <button class="btn" style="width: auto; background: var(--border); color: var(--dark);" onclick="backToUniversity()">
+                        ← Back to University
+                    </button>
+                </div>
+                
+                <!-- Tabs for Videos and Assignments -->
+                <div class="course-tabs" style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
+                    <button class="tab-btn active" onclick="showCourseTab('videos')" id="videosTab">
+                        🎥 Lectures
+                    </button>
+                    <button class="tab-btn" onclick="showCourseTab('assignments')" id="assignmentsTab">
+                        📝 Assignments
+                    </button>
+                </div>
+                
+                <!-- Videos Tab Content -->
+                <div id="videosTabContent" class="tab-content">
+                    <div class="video-grid" id="universityVideoGrid">
+                        <!-- University videos will be dynamically inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Assignments Tab Content -->
+                <div id="assignmentsTabContent" class="tab-content" style="display: none;">
+                    <div class="assignments-grid" id="assignmentsGrid">
+                        <!-- Assignments will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Video Section (Existing) -->
+            <div id="videoSection" class="video-section" style="display: none;">
                 <div class="section-header">
                     <h2 class="section-title" id="videoSectionTitle">Course Videos</h2>
                     <div style="display: flex; gap: 10px;">
                         <button class="btn btn-primary" style="width: auto;" onclick="showAddVideoModal()">
                             + Add Video
                         </button>
-                        <button class="btn" style="width: auto; background: var(--border); color: var(--dark);" onclick="showCourses()">
-                            ← Back to Courses
+                        <button class="btn" style="width: auto; background: var(--border); color: var(--dark);" onclick="backToCommunity()">
+                            ← Back to Community
                         </button>
                     </div>
                 </div>
